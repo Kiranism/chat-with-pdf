@@ -1,6 +1,7 @@
 import { connect } from "@/db/dbConfig";
 import { createChat } from "@/db/helper";
 import Chat from "@/db/models/chatModel";
+import { loadPdfIntoPinecone } from "@/lib/pinecone";
 // import { loadS3IntoPinecone } from "@/lib/pinecone";
 // import { getS3Url } from "@/lib/s3";
 import { auth } from "@clerk/nextjs";
@@ -22,7 +23,8 @@ export async function POST(req: Request, res: Response) {
     const pdf = await utapi.getFileUrls(file_key);
     console.log("pdf from server==>", pdf);
     const file_url = pdf[0].url;
-    // await loadS3IntoPinecone(file_key);
+    let doc = await loadPdfIntoPinecone(file_key, file_url);
+    console.log("doc===>", doc);
     const data = {
       file_key,
       file_name,
@@ -32,17 +34,19 @@ export async function POST(req: Request, res: Response) {
     const chat = await createChat(data);
     console.log("chat=>", chat);
     const chat_id = chat._id;
+    const chat_name = chat.file_name;
 
     return NextResponse.json(
       {
         chat_id,
+        chat_name,
       },
       { status: 200 }
     );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "internal server error" },
+      { error: "internal server error", msg: error },
       { status: 500 }
     );
   }

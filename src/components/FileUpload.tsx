@@ -6,8 +6,10 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useToast } from "./ui/use-toast";
 export const FileUpload = () => {
   const router = useRouter();
+  const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const { mutate, isLoading } = useMutation({
     mutationFn: async ({
@@ -32,25 +34,32 @@ export const FileUpload = () => {
       onClientUploadComplete={(res) => {
         // Do something with the response
         console.log("Files: ", res);
-
-        alert("Upload Completed");
         const data = {
           file_key: res![0].key,
           file_name: res![0].name,
         };
         mutate(data, {
-          onSuccess: ({ chat_id }) => {
-            // toast.success("Chat created!");
+          onSuccess: ({ chat_id, chat_name }) => {
+            toast({
+              title: "Chat created!",
+              description: `Chat session created for ${chat_name}`,
+            });
             router.push(`/chat/${chat_id}`);
           },
           onError: (err) => {
-            // toast.error("Error creating chat");
+            toast({
+              variant: "destructive",
+              title: "Error creating chat!",
+            });
             console.error(err);
           },
         });
       }}
       onUploadError={(error: Error) => {
-        alert(`ERROR! ${error.message}`);
+        toast({
+          variant: "destructive",
+          title: `ERROR! ${error.message}`,
+        });
       }}
       onUploadBegin={(name) => {
         // Do something once upload begins

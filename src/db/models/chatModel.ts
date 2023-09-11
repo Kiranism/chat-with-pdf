@@ -49,6 +49,7 @@ const userSubscriptionSchema = new mongoose.Schema({
   },
 });
 
+
 const Chat = mongoose.models.chats || mongoose.model("chats", chatSchema);
 
 export default Chat;
