@@ -50,7 +50,7 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
   console.log("inserting vectors into pinecone");
 
-  let res = await namespace.upsert(vectors);
+  let res = await pineconeIndex.upsert(vectors);
   console.log("res from pine==>", res);
   return documents[0];
   // PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);

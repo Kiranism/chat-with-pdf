@@ -4,6 +4,7 @@ import { getContext } from "@/lib/context";
 import { connect } from "@/db/dbConfig";
 import Chat from "@/db/models/chatModel";
 import { NextResponse } from "next/server";
+import _message from "@/db/models/messageModel";
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -48,7 +49,25 @@ export async function POST(req: Request) {
       ],
       stream: true,
     });
-    const stream = OpenAIStream(response);
+    const stream = OpenAIStream(response, {
+      onStart: async () => {
+        //save user message into db
+        const data = {
+          chatId: chatId,
+          content: lastMessage.content,
+          role: "user",
+        };
+        await _message.create(data);
+      },
+      onCompletion: async (completion) => {
+        const data = {
+          chatId: chatId,
+          content: completion,
+          role: "system",
+        };
+        await _message.create(data);
+      },
+    });
     return new StreamingTextResponse(stream);
   } catch (error) {
     console.log("some error happended in chatCompletion", error);

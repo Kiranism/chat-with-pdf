@@ -14,11 +14,12 @@ export async function getMatchesFromEmbeddings(
   try {
     const namespaceWithoutAscii = convertToAscii(fileKey);
     const namespace = index.namespace(namespaceWithoutAscii);
-    const queryResult = await namespace.query({
+    const queryResult = await index.query({
       topK: 5,
       vector: embeddings,
       includeMetadata: true,
     });
+    console.log("queryRes=>", queryResult);
     return queryResult.matches || [];
   } catch (error) {
     console.log("error querying embeddings", error);

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "./ui/use-toast";
+import { Loader2 } from "lucide-react";
 export const FileUpload = () => {
   const router = useRouter();
   const { toast } = useToast();
@@ -29,8 +30,20 @@ export const FileUpload = () => {
 
   return (
     <UploadDropzone<OurFileRouter>
-      className="bg-gradient-to-r from-rose-100 to-teal-100 ut-label:text-lg ut-allowed-content:ut-uploading:text-red-300"
+      className="bg-gradient-to-r from-yellow-50 to-teal-100 ut-label:text-lg ut-allowed-content:ut-uploading:text-red-300"
       endpoint="pdfUploader"
+      content={{
+        allowedContent({ isUploading }) {
+          if (isUploading || isLoading)
+            return (
+              <>
+                <p className="mt-2 text-sm text-slate-400 animate-pulse">
+                  Spilling Tea to GPT...
+                </p>
+              </>
+            );
+        },
+      }}
       onClientUploadComplete={(res) => {
         // Do something with the response
         console.log("Files: ", res);
