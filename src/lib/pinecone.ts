@@ -44,11 +44,13 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   console.log("vectors", vectors);
 
   // upload the vector to pinecone
-  const client = new Pinecone();
-  const pineconeIndex = client.Index("chat-with-pdf");
+  const client = pinecone;
+  const pineconeIndex = client.index("chat-with-pdf");
+  const namespaceWithoutAsci = convertToAscii(file_key);
+  const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
   console.log("inserting vectors into pinecone");
-  const namespace = convertToAscii(file_key);
-  let res = await pineconeIndex.upsert(vectors);
+
+  let res = await namespace.upsert(vectors);
   console.log("res from pine==>", res);
   return documents[0];
   // PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);

@@ -2,6 +2,7 @@ import ChatComponent from "@/components/ChatComponent";
 import ChatSideBar from "@/components/ChatSideBar";
 import PDFViewer from "@/components/PDFViewer";
 import { connect } from "@/db/dbConfig";
+import { ChatData } from "@/db/helper";
 import Chat from "@/db/models/chatModel";
 // import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
@@ -26,14 +27,14 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
   const _chats = await Chat.find({ userId: userId }).lean();
   console.log("_chats:=>", _chats);
 
-  if (!_chats) {
+  if (_chats.length === 0) {
     return redirect("/");
   }
-  // @ts-ignore
+
   const chatsWithIdAsString = _chats.map((chat) => ({
     ...chat,
     _id: chat._id?.toString(),
-  }));
+  })) as ChatData[];
 
   // if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
   //   return redirect("/");
@@ -49,12 +50,10 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
       <div className="flex w-full max-h-screen overflow-scroll">
         {/* chat sidebar */}
         <div className="flex-[1] max-w-xs">
-          // @ts-ignore
           <ChatSideBar chats={chatsWithIdAsString} chatId={chatId} />
         </div>
         {/* pdf viewer */}
         <div className="max-h-screen p-4 oveflow-scroll flex-[5]">
-          // @ts-ignore
           <PDFViewer file_url={currentChat?.file_url || ""} />
         </div>
         {/* chat component */}
