@@ -2,12 +2,23 @@ import { FileUpload } from "@/components/FileUpload";
 import { Button } from "@/components/ui/button";
 import { utapi } from "uploadthing/server";
 import { UserButton, auth } from "@clerk/nextjs";
-import { LogIn } from "lucide-react";
+import { ArrowRight, LogIn } from "lucide-react";
 import Link from "next/link";
 import Random from "@/components/Random";
+import { connect } from "@/db/dbConfig";
+import Chat from "@/db/models/chatModel";
+import { ChatData } from "@/db/helper";
+
+connect();
 export default async function Home() {
   const { userId } = await auth();
   const isAuth = !!userId;
+
+  let firstChat;
+  if (userId) {
+    firstChat = (await Chat.findOne({ userId }).lean()) as ChatData;
+  }
+  console.log("firstchat", firstChat);
 
   return (
     <div className="w-screen min-h-screen bg-gradient-to-r from-yellow-400 via-gray-50 to-teal-300">
@@ -18,7 +29,13 @@ export default async function Home() {
             <UserButton afterSignOutUrl="/" />
           </div>
           <div className="flex mt-2">
-            {isAuth && <Button>Go to Chats</Button>}
+            {isAuth && firstChat && (
+              <Link href={`/chat/${firstChat?._id?.toString()}`}>
+                <Button>
+                  Go to Chats <ArrowRight className="ml-2" />
+                </Button>
+              </Link>
+            )}
           </div>
           <p className="max-w-xl mt-1 text-slg text-slate-600">
             Chat with any PDF. Join millions of students, researchers and

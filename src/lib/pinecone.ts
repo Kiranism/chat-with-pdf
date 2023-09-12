@@ -13,6 +13,7 @@ import { downloadFromURL } from "./downloadFile";
 import { getEmbeddings } from "./embeddings";
 import md5 from "md5";
 import { convertToAscii } from "./utils";
+import { embeddingTransformer } from "./transformers";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -58,8 +59,8 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
 
 async function embedDocument(doc: Document) {
   try {
-    const embeddings = await getEmbeddings(doc.pageContent);
-    // console.log("embeddings=>", embeddings);
+    const embeddings = await embeddingTransformer(doc.pageContent);
+    console.log("embeddings=>", embeddings);
     const hash = md5(doc.pageContent);
     return {
       id: hash,
@@ -84,10 +85,7 @@ async function prepareDoc(page: PDFPage) {
   let { metadata, pageContent } = page;
   pageContent = pageContent.replace(/\n/g, "");
   // split the docs
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 3000,
-    chunkOverlap: 0,
-  });
+  const splitter = new RecursiveCharacterTextSplitter();
   const docs = await splitter.splitDocuments([
     new Document({
       pageContent,

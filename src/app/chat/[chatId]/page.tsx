@@ -36,7 +36,7 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
     _id: chat._id?.toString(),
   })) as ChatData[];
 
-  // if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
+  // if (!_chats.find((chat) => chat._id === chatId)) {
   //   return redirect("/");
   // }
 

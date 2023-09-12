@@ -20,6 +20,7 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "@uploadthing/react": "^5.5.0",
+    "@xenova/transformers": "^2.6.0",
     "ai": "^2.2.12",
     "autoprefixer": "10.4.15",
     "axios": "^1.5.0",
