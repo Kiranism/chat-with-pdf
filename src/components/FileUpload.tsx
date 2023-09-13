@@ -30,7 +30,7 @@ export const FileUpload = () => {
 
   return (
     <UploadDropzone<OurFileRouter>
-      className="bg-gradient-to-r from-yellow-50 to-teal-100 ut-label:text-lg ut-allowed-content:ut-uploading:text-red-300"
+      className="bg-white ut-label:text-lg ut-allowed-content:ut-uploading:text-red-300"
       endpoint="pdfUploader"
       content={{
         allowedContent({ isUploading }) {

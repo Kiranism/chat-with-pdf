@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { Input } from "./ui/input";
 import { useChat } from "ai/react";
 import { Button } from "./ui/button";
@@ -29,31 +29,26 @@ const ChatComponent = ({ chatId }: Props) => {
     },
     initialMessages: data || [],
   });
+  const messageRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
-    const messageContainer = document.getElementById("message-container");
-    if (messageContainer) {
-      messageContainer.scrollTo({
-        top: messageContainer.scrollHeight,
-        behavior: "smooth",
-      });
+    if (messageRef.current) {
+      messageRef.current.scrollTop = messageRef.current.scrollHeight;
     }
   }, [messages]);
+
   return (
-    <div
-      className="relative max-h-screen overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300"
-      id="message-container"
-    >
+    <div className="relative max-h-full min-h-full">
       {/* header */}
-      <div className="sticky top-0 inset-x-0 p-2 bg-white h-fit">
+      <div className="hidden md:!block sticky top-0 inset-x-0 p-2 bg-white h-fit">
         <h3 className="text-xl font-bold">Chat</h3>
       </div>
 
       {/* message list */}
-      <MessageList messages={messages} isLoading={isLoading} />
-
+      <MessageList messages={messages} isLoading={isLoading}  messageRef={messageRef} />
+      <div></div>
       <form
         onSubmit={handleSubmit}
-        className="sticky bottom-0 inset-x-0 px-2 py-4 bg-white"
+        className="absolute bottom-0 inset-x-0 px-2 py-2 bg-white"
       >
         <div className="flex">
           <Input

@@ -1,5 +1,8 @@
 import ChatComponent from "@/components/ChatComponent";
 import ChatSideBar from "@/components/ChatSideBar";
+import { PanelRightOpen } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/Sheet";
+import { Button } from "@/components/ui/button";
 import PDFViewer from "@/components/PDFViewer";
 import { connect } from "@/db/dbConfig";
 import { ChatData } from "@/db/helper";
@@ -47,13 +50,39 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
 
   return (
     <div className="flex max-h-screen">
-      <div className="flex w-full max-h-screen overflow-hidden">
+      <div className="flex relative flex-col md:!flex-row w-full max-h-screen min-h-screen overflow-hidden">
         {/* chat sidebar */}
-        <div className="flex-[1] max-w-xs">
+        <div className="hidden md:!flex max-w-xs">
           <ChatSideBar chats={chatsWithIdAsString} chatId={chatId} />
         </div>
+
+        <div className="m-2 flex md:!hidden gap-2 items-center">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="flex h-9 lg:hidden"
+                aria-label="Open right panel"
+              >
+                <PanelRightOpen size={20} />
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent side={"left"} className="w-[17rem] p-0">
+              <ChatSideBar chats={chatsWithIdAsString} chatId={chatId} />
+            </SheetContent>
+          </Sheet>
+          <div>
+            <h3 className="text-base font-bold">Chat</h3>
+            <p className="text-xs text-slate-600 truncate text-ellipsis">
+              {currentChat?.file_name}
+            </p>
+          </div>
+        </div>
+
         {/* pdf viewer */}
-        <div className="max-h-screen p-4 oveflow-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 flex-[5]">
+        <div className="max-h-screen p-4 hidden md:!flex oveflow-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 flex-[5]">
           <PDFViewer file_url={currentChat?.file_url || ""} />
         </div>
         {/* chat component */}
