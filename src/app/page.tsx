@@ -5,20 +5,21 @@ import { UserButton, auth } from "@clerk/nextjs";
 import { ArrowRight, LogIn } from "lucide-react";
 import Link from "next/link";
 import Random from "@/components/Random";
-import { connect } from "@/db/dbConfig";
-import Chat from "@/db/models/chatModel";
-import { ChatData } from "@/db/helper";
+import { db } from "@/lib/db";
+import { chats } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
-connect();
 export default async function Home() {
   const { userId } = await auth();
   const isAuth = !!userId;
 
-  let firstChat;
-  if (userId) {
-    firstChat = (await Chat.findOne({ userId }).lean()) as ChatData;
-  }
-  console.log("firstchat", firstChat);
+  // let firstChat;
+  // if (userId) {
+  //   firstChat = await db.select().from(chats).where(eq(chats.userId, userId));
+  //   if (firstChat) {
+  //     firstChat = firstChat[0];
+  //   }
+  // }
 
   return (
     <div className="w-screen min-h-screen bg-gradient-to-r from-rose-100 to-teal-100">
@@ -31,13 +32,13 @@ export default async function Home() {
             <UserButton afterSignOutUrl="/" />
           </div>
           <div className="flex mt-2">
-            {isAuth && firstChat && (
-              <Link href={`/chat/${firstChat?._id?.toString()}`}>
+            {/* {isAuth && firstChat && (
+              <Link href={`/chat/${firstChat.id}`}>
                 <Button>
                   Go to Chats <ArrowRight className="ml-2" />
                 </Button>
               </Link>
-            )}
+            )} */}
           </div>
           <p className="max-w-xl mt-1 text-slg text-slate-600">
             Chat with any PDF. Join millions of students, researchers and

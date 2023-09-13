@@ -1,26 +1,29 @@
 import { Configuration, OpenAIApi } from "openai-edge";
 import { OpenAIStream, StreamingTextResponse, Message } from "ai";
 import { getContext } from "@/lib/context";
-import { connect } from "@/db/dbConfig";
-import Chat from "@/db/models/chatModel";
+import { db } from "@/lib/db";
+import { chats, messages as _messages } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import _message from "@/db/models/messageModel";
+
+export const runtime = "edge";
+
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(config);
-connect();
+
 export async function POST(req: Request) {
   try {
     const { messages, chatId } = await req.json();
-    const lastMessage = messages[messages.length - 1];
-    const _chat = await Chat.findById({ _id: chatId });
-    console.log("chat from api chat", _chat);
-    if (!_chat) {
+
+    const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+    if (_chats.length != 1) {
       return NextResponse.json({ error: "chat not found" }, { status: 404 });
     }
-
-    const fileKey = _chat.file_key;
+    const fileKey = _chats[0].fileKey;
+    const lastMessage = messages[messages.length - 1];
     const context = await getContext(lastMessage.content, fileKey);
     console.log("lol context", context);
     const prompt = {
@@ -51,21 +54,20 @@ export async function POST(req: Request) {
     });
     const stream = OpenAIStream(response, {
       onStart: async () => {
-        //save user message into db
-        const data = {
-          chatId: chatId,
+        // save user message into db
+        await db.insert(_messages).values({
+          chatId,
           content: lastMessage.content,
           role: "user",
-        };
-        await _message.create(data);
+        });
       },
       onCompletion: async (completion) => {
-        const data = {
-          chatId: chatId,
+        // save ai message into db
+        await db.insert(_messages).values({
+          chatId,
           content: completion,
           role: "system",
-        };
-        await _message.create(data);
+        });
       },
     });
     return new StreamingTextResponse(stream);

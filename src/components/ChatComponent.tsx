@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Message } from "ai";
 
-type Props = { chatId: string };
+type Props = { chatId: number };
 
 const ChatComponent = ({ chatId }: Props) => {
   const { data, isLoading } = useQuery({
@@ -44,7 +44,11 @@ const ChatComponent = ({ chatId }: Props) => {
       </div>
 
       {/* message list */}
-      <MessageList messages={messages} isLoading={isLoading}  messageRef={messageRef} />
+      <MessageList
+        messages={messages}
+        isLoading={isLoading}
+        messageRef={messageRef}
+      />
       <div></div>
       <form
         onSubmit={handleSubmit}

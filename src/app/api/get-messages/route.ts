@@ -1,11 +1,15 @@
-import { connect } from "@/db/dbConfig";
-import Message from "@/db/models/messageModel";
+import { db } from "@/lib/db";
+import { messages } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-connect();
+export const runtime = "edge";
+
 export const POST = async (req: Request) => {
   const { chatId } = await req.json();
-  const _messages = await Message.find({ chatId });
-  console.log("yo messages=>", _messages);
+  const _messages = await db
+    .select()
+    .from(messages)
+    .where(eq(messages.chatId, chatId));
   return NextResponse.json(_messages);
 };

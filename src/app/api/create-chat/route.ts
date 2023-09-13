@@ -1,6 +1,5 @@
-import { connect } from "@/db/dbConfig";
-import { createChat } from "@/db/helper";
-import Chat from "@/db/models/chatModel";
+import { db } from "@/lib/db";
+import { chats } from "@/lib/db/schema";
 import { loadPdfIntoPinecone } from "@/lib/pinecone";
 // import { loadS3IntoPinecone } from "@/lib/pinecone";
 // import { getS3Url } from "@/lib/s3";
@@ -9,8 +8,6 @@ import { NextResponse } from "next/server";
 import { utapi } from "uploadthing/server";
 
 // /api/create-chat
-export const fetchCache = "force-no-store";
-connect();
 export async function POST(req: Request, res: Response) {
   const { userId } = await auth();
   console.log("userID from server", userId);
@@ -26,21 +23,21 @@ export async function POST(req: Request, res: Response) {
     const file_url = pdf[0].url;
     let doc = await loadPdfIntoPinecone(file_key, file_url);
     console.log("doc===>", doc);
-    const data = {
-      file_key,
-      file_name,
-      file_url,
-      userId,
-    };
-    const chat = await createChat(data);
-    console.log("chat=>", chat);
-    const chat_id = chat._id;
-    const chat_name = chat.file_name;
-
+    const chat_id = await db
+      .insert(chats)
+      .values({
+        fileKey: file_key,
+        pdfName: file_name,
+        pdfUrl: file_url,
+        userId,
+      })
+      .returning({
+        insertedId: chats?.id,
+      });
+    console.log("chat==?", chat_id);
     return NextResponse.json(
       {
-        chat_id,
-        chat_name,
+        chat_id: chat_id[0]?.insertedId,
       },
       { status: 200 }
     );
