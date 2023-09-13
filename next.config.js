@@ -3,7 +3,7 @@ const nextConfig = {
   output: "standalone",
   webpack: true,
   webpack: (config) => {
-    config.resolve.fallback = { fs: false };
+    config.resolve.fallback = { fs: false, os: false };
     return config;
   },
   experimental: {
