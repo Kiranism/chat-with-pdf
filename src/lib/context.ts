@@ -13,11 +13,13 @@ export async function getMatchesFromEmbeddings(
   });
   const index = await pinecone.Index("chat-with-pdf");
   try {
-    const namespaceWithoutAscii = convertToAscii(fileKey);
-    const namespace = index.namespace(namespaceWithoutAscii);
+    const fileKeyWithoutAsci = convertToAscii(fileKey);
+    // const namespace = index.namespace(namespaceWithoutAscii);
+    const filter = { fileKey: { $eq: fileKeyWithoutAsci } };
     const queryResult = await index.query({
       topK: 5,
       vector: embeddings,
+      filter: filter,
       includeMetadata: true,
     });
     console.log("queryRes=>", queryResult);
@@ -32,7 +34,7 @@ export async function getContext(query: string, fileKey: string) {
   const queryEmbeddings = await embeddingTransformer(query);
   console.log("queryEmbeddings", queryEmbeddings);
   const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileKey);
-  console.log("matched", matches)
+  console.log("matched", matches);
   const qualifyingDocs = matches.filter(
     (match) => match.score && match.score > 0.7
   );

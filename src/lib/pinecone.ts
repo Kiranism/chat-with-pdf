@@ -39,16 +39,18 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   // split and segment the pdf
   const documents = await Promise.all(pages.map(prepareDoc));
   console.log("documents", documents);
-
+  const fileKeyWithoutAsci = convertToAscii(file_key);
   // vectorise and embed individual docs
-  const vectors = await Promise.all(documents.flat().map(embedDocument));
+  const vectors = await Promise.all(
+    documents.flat().map((doc) => embedDocument(doc, fileKeyWithoutAsci))
+  );
   console.log("vectors", vectors);
 
   // upload the vector to pinecone
   const client = pinecone;
   const pineconeIndex = client.index("chat-with-pdf");
-  const namespaceWithoutAsci = convertToAscii(file_key);
-  const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
+
+  // const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
   console.log("inserting vectors into pinecone");
 
   let res = await pineconeIndex.upsert(vectors);
@@ -57,7 +59,7 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   // PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);
 }
 
-async function embedDocument(doc: Document) {
+async function embedDocument(doc: Document, file_key: string) {
   try {
     const embeddings = await embeddingTransformer(doc.pageContent);
     console.log("embeddings=>", embeddings);
@@ -67,6 +69,7 @@ async function embedDocument(doc: Document) {
       values: embeddings,
       metadata: {
         text: doc.metadata.text,
+        fileKey: file_key,
         pageNumber: doc.metadata.pageNumber,
       },
     } as PineconeRecord;
