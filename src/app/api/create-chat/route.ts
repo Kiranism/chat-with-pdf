@@ -9,6 +9,7 @@ import { NextResponse } from "next/server";
 import { utapi } from "uploadthing/server";
 
 // /api/create-chat
+export const fetchCache = "force-no-store";
 connect();
 export async function POST(req: Request, res: Response) {
   const { userId } = await auth();
