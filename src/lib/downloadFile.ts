@@ -1,5 +1,6 @@
 import axios from "axios";
 import fs from "fs";
+import os from "os";
 import path from "path";
 
 export async function downloadFromURL(file_url: string) {
@@ -13,10 +14,12 @@ export async function downloadFromURL(file_url: string) {
     const pdfContent = response.data;
 
     // Create a temporary directory using the OS's tmpdir and store the PDF there
-    const tempDirectory = process.env.TEMP! || process.env.TMP!;
+    // const tempDirectory = process.env.TEMP! || process.env.TMP!;
+    const tempDirectory = os.tmpdir();
 
     const file_name = path.join(tempDirectory, `pdf-${Date.now()}.pdf`);
-
+    // const file_name = `/temp/pdf-${Date.now()}.pdf`;
+    // fs.writeFileSync(file_name, obj.Body as Buffer);
     fs.writeFileSync(file_name, pdfContent);
     console.log(
       "File successfully written to the temporary directory:",
