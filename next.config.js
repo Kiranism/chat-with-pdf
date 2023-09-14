@@ -1,10 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: true,
-  webpack: (config) => {
-    config.resolve.fallback = { fs: false, os: false };
-    return config;
-  },
+  output: "standalone",
   experimental: {
     serverComponentsExternalPackages: ["sharp", "onnxruntime-node"],
   },
