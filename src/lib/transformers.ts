@@ -2,6 +2,7 @@ import { pipeline } from "@xenova/transformers";
 
 export async function embeddingTransformer(text: string) {
   try {
+    console.log("transformer initialized")
     const generateEmbeddings = await pipeline(
       "feature-extraction",
       "Xenova/e5-large-v2"

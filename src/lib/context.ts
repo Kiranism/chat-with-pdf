@@ -1,13 +1,14 @@
-import { Pinecone } from "@pinecone-database/pinecone";
+import { PineconeClient } from "@pinecone-database/pinecone";
 import { convertToAscii } from "./utils";
 import { getEmbeddings } from "./embeddings";
-import { embeddingTransformer } from "./transformers";
+// import { embeddingTransformer } from "./transformers";
 
 export async function getMatchesFromEmbeddings(
   embeddings: number[],
   fileKey: string
 ) {
-  const pinecone = new Pinecone({
+  const pinecone = new PineconeClient();
+  await pinecone.init({
     apiKey: process.env.PINECONE_API_KEY!,
     environment: process.env.PINECONE_ENVIRONMENT!,
   });
@@ -15,12 +16,22 @@ export async function getMatchesFromEmbeddings(
   try {
     const fileKeyWithoutAsci = convertToAscii(fileKey);
     // const namespace = index.namespace(namespaceWithoutAscii);
+    const namespace = convertToAscii(fileKey);
     const filter = { fileKey: { $eq: fileKeyWithoutAsci } };
+    // const queryResult = await index.query({
+    //   topK: 5,
+    //   vector: embeddings,
+    //   filter: filter,
+    //   includeMetadata: true,
+    // });
+
     const queryResult = await index.query({
-      topK: 5,
-      vector: embeddings,
-      filter: filter,
-      includeMetadata: true,
+      queryRequest: {
+        topK: 5,
+        vector: embeddings,
+        filter: filter,
+        includeMetadata: true,
+      },
     });
     console.log("queryRes=>", queryResult);
     return queryResult.matches || [];
@@ -31,7 +42,7 @@ export async function getMatchesFromEmbeddings(
 }
 
 export async function getContext(query: string, fileKey: string) {
-  const queryEmbeddings = await embeddingTransformer(query);
+  const queryEmbeddings = await getEmbeddings(query);
   console.log("queryEmbeddings", queryEmbeddings);
   const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileKey);
   console.log("matched", matches);

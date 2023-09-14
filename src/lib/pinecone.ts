@@ -1,7 +1,6 @@
 import {
-  Pinecone,
+  PineconeClient,
   Vector,
-  PineconeRecord,
   utils as PineconeUtils,
 } from "@pinecone-database/pinecone";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
@@ -13,12 +12,20 @@ import { downloadFromURL } from "./downloadFile";
 import { getEmbeddings } from "./embeddings";
 import md5 from "md5";
 import { convertToAscii } from "./utils";
-import { embeddingTransformer } from "./transformers";
+// import { embeddingTransformer } from "./transformers";
 
-const pinecone = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY!,
-  environment: process.env.PINECONE_ENVIRONMENT!,
-});
+let pinecone: PineconeClient | null = null;
+
+export const getPineconeClient = async () => {
+  if (!pinecone) {
+    pinecone = new PineconeClient();
+    await pinecone.init({
+      environment: process.env.PINECONE_ENVIRONMENT!,
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
+  }
+  return pinecone;
+};
 
 type PDFPage = {
   pageContent: string;
@@ -42,26 +49,34 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   const fileKeyWithoutAsci = convertToAscii(file_key);
   // vectorise and embed individual docs
   const vectors = await Promise.all(
-    documents.flat().map((doc) => embedDocument(doc, fileKeyWithoutAsci))
+    documents
+      .flat()
+      .slice(0, 3)
+      .map((doc) => embedDocument(doc, fileKeyWithoutAsci))
   );
   console.log("vectors", vectors);
 
   // upload the vector to pinecone
-  const client = pinecone;
-  const pineconeIndex = client.index("chat-with-pdf");
+  const client = await getPineconeClient();
+  const pineconeIndex = client.Index("chat-with-pdf");
 
   // const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
   console.log("inserting vectors into pinecone");
-
-  let res = await pineconeIndex.upsert(vectors);
-  console.log("res from pine==>", res);
-  return documents[0];
+  const namespace = convertToAscii(file_key);
+  await pineconeIndex.upsert({
+    upsertRequest: {
+      vectors: vectors,
+    },
+  });
   // PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);
+  // let res = await pineconeIndex.upsert(vectors);
+  console.log("res from pine==>");
+  return documents[0];
 }
 
 async function embedDocument(doc: Document, file_key: string) {
   try {
-    const embeddings = await embeddingTransformer(doc.pageContent);
+    const embeddings = await getEmbeddings(doc.pageContent);
     console.log("embeddings=>", embeddings);
     const hash = md5(doc.pageContent);
     return {
@@ -72,7 +87,7 @@ async function embedDocument(doc: Document, file_key: string) {
         fileKey: file_key,
         pageNumber: doc.metadata.pageNumber,
       },
-    } as PineconeRecord;
+    } as Vector;
   } catch (error) {
     console.log("error embedding document", error);
     throw error;
@@ -88,7 +103,10 @@ async function prepareDoc(page: PDFPage) {
   let { metadata, pageContent } = page;
   pageContent = pageContent.replace(/\n/g, "");
   // split the docs
-  const splitter = new RecursiveCharacterTextSplitter();
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 3000,
+    chunkOverlap: 0,
+  });
   const docs = await splitter.splitDocuments([
     new Document({
       pageContent,

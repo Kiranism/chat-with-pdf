@@ -12,6 +12,16 @@ yarn dev
 pnpm dev
 ```
 
+#playing with models
+openai challenges => cant perform embedding because of free tier limit 3/min. to tackle this im gonna make the chunksize high and limit to 3 not good at all but to test its enough.
+
+chatgpt model using cosine and transformer im trying dot product and cosine for similarites.
+vector dimension of text-ada open ai model is 1536, so need to update pinecone db;
+
+By using transformers i can use the "Xenova/e5-large-v2" model and its dimensions is 1024 so need to change the pinecone config.
+
+pinecone migrated from 0 to 1v so things changes including namespace not available for free tier so need to use some filter across the meta data.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
