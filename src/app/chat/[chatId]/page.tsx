@@ -40,8 +40,8 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
   // }
 
   return (
-    <div className="flex max-h-screen">
-      <div className="flex relative flex-col md:!flex-row w-full max-h-screen min-h-screen overflow-hidden">
+    <div className="flex max-h-[100dvh]">
+      <div className="flex relative flex-col md:!flex-row w-full max-h-[100dvh] min-h-[100dvh] overflow-hidden">
         {/* chat sidebar */}
         <div className="hidden md:!flex max-w-xs">
           <ChatSideBar chats={_chats} chatId={parseInt(chatId)} />
@@ -73,7 +73,7 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
         </div>
 
         {/* pdf viewer */}
-        <div className="max-h-screen p-4 hidden md:!flex oveflow-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 flex-[5]">
+        <div className="max-h-[100dvh] p-4 hidden md:!flex oveflow-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 flex-[5]">
           <PDFViewer file_url={currentChat?.pdfUrl || ""} />
         </div>
         {/* chat component */}
