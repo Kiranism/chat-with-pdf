@@ -1,6 +1,7 @@
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { convertToAscii } from "./utils";
 import { getEmbeddings } from "./embeddings";
+import { embeddingTransformer } from "./transformers";
 // import { embeddingTransformer } from "./transformers";
 
 export async function getMatchesFromEmbeddings(
@@ -42,7 +43,7 @@ export async function getMatchesFromEmbeddings(
 }
 
 export async function getContext(query: string, fileKey: string) {
-  const queryEmbeddings = await getEmbeddings(query);
+  const queryEmbeddings = await embeddingTransformer(query);
   console.log("queryEmbeddings", queryEmbeddings);
   const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileKey);
   console.log("matched", matches);

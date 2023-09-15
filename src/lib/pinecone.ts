@@ -12,6 +12,7 @@ import { downloadFromURL } from "./downloadFile";
 import { getEmbeddings } from "./embeddings";
 import md5 from "md5";
 import { convertToAscii } from "./utils";
+import { embeddingTransformer } from "./transformers";
 // import { embeddingTransformer } from "./transformers";
 
 let pinecone: PineconeClient | null = null;
@@ -76,7 +77,7 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
 
 async function embedDocument(doc: Document, file_key: string) {
   try {
-    const embeddings = await getEmbeddings(doc.pageContent);
+    const embeddings = await embeddingTransformer(doc.pageContent);
     console.log("embeddings=>", embeddings);
     const hash = md5(doc.pageContent);
     return {
