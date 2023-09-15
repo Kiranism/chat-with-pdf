@@ -52,7 +52,7 @@ const ChatComponent = ({ chatId }: Props) => {
       <div></div>
       <form
         onSubmit={handleSubmit}
-        className="absolute bottom-0 inset-x-0 px-2 py-2 bg-white"
+        className="absolute bottom-5 inset-x-0 px-2 py-2 bg-white"
       >
         <div className="flex">
           <Input
