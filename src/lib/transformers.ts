@@ -2,10 +2,10 @@ import { pipeline } from "@xenova/transformers";
 
 export async function embeddingTransformer(text: string) {
   try {
-    console.log("transformer initialized")
+    console.log("transformer initialized");
     const generateEmbeddings = await pipeline(
       "feature-extraction",
-      "Xenova/e5-large-v2"
+      "Xenova/all-MiniLM-L6-v2"
     );
     const response = await generateEmbeddings(text.replace(/\n/g, " "), {
       pooling: "mean",
