@@ -21,7 +21,7 @@ const MessageList = ({ messages, isLoading, messageRef }: Props) => {
   return (
     <div
       ref={messageRef}
-      className="flex flex-col gap-2 px-4 py-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 max-h-[80vh] md:max-h-[85vh]"
+      className="flex flex-col gap-2 px-4 py-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300 max-h-[78vh] md:max-h-[82vh]"
     >
       {messages.length > 0 &&
         messages.map((message) => {
