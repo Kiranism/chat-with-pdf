@@ -34,11 +34,19 @@ export const FileUpload = () => {
       endpoint="pdfUploader"
       content={{
         allowedContent({ isUploading }) {
-          if (isUploading || isLoading)
+          if (isUploading)
             return (
               <>
                 <p className="mt-2 text-sm text-slate-400 animate-pulse">
                   Spilling Tea to GPT...
+                </p>
+              </>
+            );
+          if (!isUploading && isLoading)
+            return (
+              <>
+                <p className="mt-2 text-sm text-slate-400 animate-pulse">
+                  Loading...we are almost there!
                 </p>
               </>
             );
