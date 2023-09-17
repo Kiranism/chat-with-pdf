@@ -44,7 +44,7 @@ export default async function Home() {
             professionals to instantly answer questions and understand research
             with AI.
           </p>
-          <div className="w-full mt-4">
+          <div className="max-w-xl mt-4">
             {isAuth ? (
               <>
                 <FileUpload />

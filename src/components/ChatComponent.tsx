@@ -40,7 +40,7 @@ const ChatComponent = ({ chatId }: Props) => {
     <div className="relative max-h-full min-h-full">
       {/* header */}
       <div className="hidden md:!block sticky top-0 inset-x-0 p-2 bg-white h-fit">
-        <h3 className="text-xl font-bold">Chat</h3>
+        <h3 className="text-xl font-bold text-slate-600">Chat</h3>
       </div>
 
       {/* message list */}
