@@ -6,7 +6,7 @@ import { ArrowRight, LogIn } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -14,7 +14,11 @@ export default async function Home() {
 
   let firstChat;
   if (userId) {
-    firstChat = await db.select().from(chats).where(eq(chats.userId, userId));
+    firstChat = await db
+      .select()
+      .from(chats)
+      .where(eq(chats.userId, userId))
+      .orderBy(desc(chats.createdAt));
     if (firstChat) {
       firstChat = firstChat[0];
     }
@@ -22,15 +26,15 @@ export default async function Home() {
 
   return (
     <div className="w-screen min-h-[100dvh] bg-gradient-to-r from-rose-100 to-teal-100">
-      <div className="absolute w-full px-3 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div className="flex flex-col items-center text-center">
-          <div className="flex items-center">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="flex min-w-72 max-w-xl flex-col items-center text-center">
+          <div className="flex w-full justify-center items-center">
             <h1 className="mr-3 text-4xl md:text-5xl font-semibold ">
               Chat With PDF
             </h1>
             <UserButton afterSignOutUrl="/" />
           </div>
-          <div className="flex mt-2">
+          <div className="flex justify-center w-full mt-2">
             {isAuth && firstChat && (
               <Link href={`/chat/${firstChat.id}`}>
                 <Button>
@@ -39,12 +43,12 @@ export default async function Home() {
               </Link>
             )}
           </div>
-          <p className="max-w-xl mt-1 text-lg text-slate-600">
+          <p className="mt-1 w-full text-lg text-slate-600">
             Chat with any PDF. Join millions of students, researchers and
             professionals to instantly answer questions and understand research
             with AI.
           </p>
-          <div className="max-w-xl mt-4">
+          <div className="w-full mt-4">
             {isAuth ? (
               <>
                 <FileUpload />

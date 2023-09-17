@@ -4,7 +4,7 @@ import { PanelRightOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/button";
 import PDFViewer from "@/components/PDFViewer";
-import { eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 // import { checkSubscription } from "@/lib/subscription";
@@ -25,7 +25,11 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
     return redirect("/sign-in");
   }
 
-  const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
+  const _chats = await db
+    .select()
+    .from(chats)
+    .where(eq(chats.userId, userId))
+    .orderBy(desc(chats.createdAt));
   if (!_chats) {
     return redirect("/");
   }
