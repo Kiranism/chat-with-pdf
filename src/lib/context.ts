@@ -47,15 +47,15 @@ export async function getContext(query: string, fileKey: string) {
   console.log("queryEmbeddings", queryEmbeddings);
   const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileKey);
   console.log("matched", matches);
-  const qualifyingDocs = matches.filter(
-    (match) => match.score && match.score > 0.3
-  );
+  // const qualifyingDocs = matches.filter(
+  //   (match) => match.score && match.score > 0.3
+  // );
 
   type Metadata = {
     text: string;
     pageNumber: number;
   };
-  let docs = qualifyingDocs.map((match) => (match.metadata as Metadata).text);
+  let docs = matches.map((match) => (match.metadata as Metadata).text);
 
   console.log("matching docs=>", docs);
   return docs.join("\n").substring(0, 3000);
