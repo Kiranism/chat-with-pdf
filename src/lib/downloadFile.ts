@@ -17,7 +17,7 @@ export async function downloadFromURL(file_url: string) {
     // const tempDirectory = process.env.TEMP! || process.env.TMP!;
     const tempDirectory = os.tmpdir();
 
-    const file_name = path.join(tempDirectory, `pdf-${Date.now()}.pdf`);
+    const file_name = path.join(process.cwd(), `pdf-${Date.now()}.pdf`);
     // const file_name = `/temp/pdf-${Date.now()}.pdf`;
     // fs.writeFileSync(file_name, obj.Body as Buffer);
     fs.writeFileSync(file_name, pdfContent);
