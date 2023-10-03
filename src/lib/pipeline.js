@@ -2,10 +2,13 @@ import { Pipeline, pipeline } from "@xenova/transformers";
 
 // Use the Singleton pattern to enable lazy construction of the pipeline.
 // NOTE: We wrap the class in a function to prevent code duplication (see below).
+// Xenova / all - MiniLM - L6 - v2 // cosine DIMENSIONS 384
+
+// Xenova/e5-large-v2
 const P = () =>
   class PipelineSingleton {
     static task = "feature-extraction";
-    static model = "Xenova/all-MiniLM-L6-v2";
+    static model = "Xenova/e5-large-v2";
     static instance = null;
 
     static async getInstance(progress_callback = null) {

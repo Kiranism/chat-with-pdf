@@ -21,8 +21,16 @@ export async function POST(req: Request, res: Response) {
     const pdf = await utapi.getFileUrls(file_key);
     console.log("pdf from server==>", pdf);
     const file_url = pdf[0].url;
-    let doc = await loadPdfIntoPinecone(file_key, file_url);
-    console.log("doc===>", doc);
+    try {
+      let doc = await loadPdfIntoPinecone(file_key, file_url);
+      console.log("doc===>", doc);
+    } catch (error) {
+      console.log("errror from pineconefn", error);
+      return NextResponse.json(
+        { error: "4page pdf is not supported at the moment.", msg: error },
+        { status: 400 }
+      );
+    }
     const chat_id = await db
       .insert(chats)
       .values({
