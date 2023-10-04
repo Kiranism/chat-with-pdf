@@ -1,8 +1,4 @@
-import {
-  PineconeClient,
-  Vector,
-  utils as PineconeUtils,
-} from "@pinecone-database/pinecone";
+import { Pinecone, PineconeRecord } from "@pinecone-database/pinecone";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import {
   Document,
@@ -15,17 +11,11 @@ import { convertToAscii } from "./utils";
 import { embeddingTransformer } from "./transformers";
 // import { embeddingTransformer } from "./transformers";
 
-let pinecone: PineconeClient | null = null;
-
-export const getPineconeClient = async () => {
-  if (!pinecone) {
-    pinecone = new PineconeClient();
-    await pinecone.init({
-      environment: process.env.PINECONE_ENVIRONMENT!,
-      apiKey: process.env.PINECONE_API_KEY!,
-    });
-  }
-  return pinecone;
+export const getPineconeClient = () => {
+  return new Pinecone({
+    environment: process.env.PINECONE_ENVIRONMENT!,
+    apiKey: process.env.PINECONE_API_KEY!,
+  });
 };
 
 type PDFPage = {
@@ -57,18 +47,9 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   // upload the vector to pinecone
   const client = await getPineconeClient();
   const pineconeIndex = client.Index("chat-with-pdf");
-
-  // const namespace = pineconeIndex.namespace(namespaceWithoutAsci);
+  const namespace = pineconeIndex.namespace(convertToAscii(file_key));
   console.log("inserting vectors into pinecone");
-  const namespace = convertToAscii(file_key);
-  await pineconeIndex.upsert({
-    upsertRequest: {
-      vectors: vectors,
-    },
-  });
-  // PineconeUtils.chunkedUpsert(pineconeIndex, vectors, namespace, 10);
-  // let res = await pineconeIndex.upsert(vectors);
-  console.log("res from pine==>");
+  await namespace.upsert(vectors);
   return documents[0];
 }
 
@@ -85,7 +66,7 @@ async function embedDocument(doc: Document, file_key: string) {
         fileKey: file_key,
         pageNumber: doc.metadata.pageNumber,
       },
-    } as Vector;
+    } as PineconeRecord;
   } catch (error) {
     console.log("error embedding document", error);
     throw error;
