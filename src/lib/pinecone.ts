@@ -56,12 +56,10 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
 
   //upload to pinecone
   const client = await getPineconeClient();
-  const pineconeIndex = await client.index("chat-with-pdf");
+  const pineconeIndex = client.Index("chat-with-pdf");
   const namespace = pineconeIndex.namespace(convertToAscii(file_key));
-
   console.log("inserting vectors into pinecone");
   await namespace.upsert(vectors);
-
   return documents[0];
 }
 
