@@ -44,6 +44,10 @@ export async function loadPdfIntoPinecone(file_key: string, file_url: string) {
   const loader = new PDFLoader(file_name);
   const pages = (await loader.load()) as PDFPage[];
   console.log("pagees=>", pages);
+  const pagesNum = pages.length;
+  if (pagesNum > 2) {
+    throw new Error("Pdf's greater than 3 pages not supported atm");
+  }
   // split and segment the pdf
   const documents = await Promise.all(pages.map(prepareDoc));
   console.log("documents", documents);

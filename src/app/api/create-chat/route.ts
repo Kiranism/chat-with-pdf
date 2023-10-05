@@ -43,9 +43,11 @@ export async function POST(req: Request, res: Response) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    const errorMessage =
+      error instanceof Error && error.message ? error.message : "Unknown error";
+    console.error("error=>", errorMessage);
     return NextResponse.json(
-      { error: "internal server error", msg: error },
+      { error: "internal server error", msg: errorMessage },
       { status: 500 }
     );
   }

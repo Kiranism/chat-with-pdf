@@ -68,9 +68,17 @@ export const FileUpload = () => {
             router.push(`/chat/${chat_id}`);
           },
           onError: (err) => {
+            console.log("eror in frontend", err);
+
+            const errorMessage =
+              // @ts-ignore
+              err && err.response.data.msg
+                ? // @ts-ignore
+                  err.response.data.msg
+                : "Error creating chat!";
             toast({
               variant: "destructive",
-              title: "Error creating chat!",
+              title: errorMessage,
             });
             console.error(err);
           },
